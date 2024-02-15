@@ -1,0 +1,79 @@
+﻿@model Entity.Bookmark
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h4>Edit Bookmark (Using AJAX call)</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form id="edit-bookmark">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input id="bookmark-id" type="hidden" asp-for="ID" value="@Model.ID" />
+            <div class="form-group">
+                <label asp-for="URL" class="control-label"></label>
+                <input id="url" asp-for="URL" class="form-control" required/>
+                <span asp-validation-for="URL" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ShortDescription" class="control-label"></label>
+                <input id="short-desc" asp-for="ShortDescription" class="form-control" required />
+                <span asp-validation-for="ShortDescription" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Category.Name" class="control-label"></label>
+                <select id="category-id" asp-for="Category.Name" class="form-control" asp-items="ViewBag.Category"></select>
+                <span asp-validation-for="CategoryId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Update</button>
+            </div>
+            <span id="response"></span>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+<script>
+    $(document).ready(function () {
+
+        $("#edit-bookmark").submit(function (event) {
+            event.preventDefault();
+            var url = $('#url').val();
+            var shortDesc = $('#short-desc').val();
+            var bookmarkId = $('#bookmark-id').val();
+
+            var formData = {
+                'id': bookmarkId,
+                'url': url,
+                'shortDescription': shortDesc,
+                'categoryId': $('#category-id :selected').val()
+            }
+
+            $.ajax({
+                url: '/api/BookmarksApi/' + bookmarkId,
+                type: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function (response) {
+                    console.log(response);
+                    $('#response').html('<h2>Successfully Updated</h2>');
+                    //$('#edit-bookmark input').val('');
+                },
+                error: function (xhr, status, error) {
+                    alert(status + ' ' + error)
+                }
+            })
+        });
+
+    });
+</script>
+
+
+@*@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}*@
