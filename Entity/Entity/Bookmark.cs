@@ -22,5 +22,6 @@ namespace Entity
         public virtual Category Category { get; set; }
 
         public DateTime CreateDate { get; set; }
+        public DateTime LastUpdatedDate { get; set; }
     }
 }

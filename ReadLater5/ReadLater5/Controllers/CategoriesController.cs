@@ -1,10 +1,13 @@
 ﻿using Entity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Security.Claims;
+using System.Security.Principal;
 using System.Threading.Tasks;
 
 namespace ReadLater5.Controllers
@@ -12,14 +15,17 @@ namespace ReadLater5.Controllers
     public class CategoriesController : Controller
     {
         ICategoryService _categoryService;
-        public CategoriesController(ICategoryService categoryService)
+        private readonly SignInManager<IdentityUser> _signInManager;
+        public CategoriesController(ICategoryService categoryService, SignInManager<IdentityUser> signInManager)
         {
             _categoryService = categoryService;
+            _signInManager = signInManager;
         }
         // GET: Categories
         public IActionResult Index()
         {
-            List<Category> model = _categoryService.GetCategories();
+            string userId = _signInManager.UserManager.GetUserId(User) ?? string.Empty;
+            List<Category> model = _categoryService.GetCategories(userId);
             return View(model);
         }
 
@@ -54,6 +60,7 @@ namespace ReadLater5.Controllers
         {
             if (ModelState.IsValid)
             {
+                category.UserId = _signInManager.UserManager.GetUserId(User) ?? string.Empty;
                 _categoryService.CreateCategory(category);
                 return RedirectToAction("Index");
             }

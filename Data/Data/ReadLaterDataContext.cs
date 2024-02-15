@@ -23,5 +23,7 @@ namespace Data
 
         public DbSet<Category> Categories { get; set; }
         public DbSet<Bookmark> Bookmark { get; set; }
+
+        //public DbSet<>
     }
 }

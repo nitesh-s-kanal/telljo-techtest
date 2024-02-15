@@ -29,9 +29,9 @@ namespace Services
             _ReadLaterDataContext.SaveChanges();
         }
 
-        public List<Category> GetCategories()
+        public List<Category> GetCategories(string userId)
         {
-            return _ReadLaterDataContext.Categories.ToList();
+            return _ReadLaterDataContext.Categories.Where(c => c.UserId == userId).ToList();
         }
 
         public Category GetCategory(int Id)

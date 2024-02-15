@@ -14,5 +14,9 @@ namespace Entity
 
         [StringLength(maximumLength: 50)]
         public string Name { get; set; }
+
+        [StringLength(maximumLength: 50)]
+        public string UserId { get; set; }
+
     }
 }

@@ -54,10 +54,13 @@ namespace ReadLater5.Controllers
                 return BadRequest();
             }
 
+            //var existingBookmark = await _context.Bookmark.FindAsync(id);
             _context.Entry(bookmark).State = EntityState.Modified;
 
             try
             {
+               // bookmark.CreateDate = existingBookmark.CreateDate;
+                bookmark.LastUpdatedDate = DateTime.UtcNow;
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)

@@ -7,22 +7,26 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Data;
 using Entity;
+using Microsoft.AspNetCore.Identity;
 
 namespace ReadLater5.Controllers
 {
     public class BookmarksController : Controller
     {
         private readonly ReadLaterDataContext _context;
+        private readonly SignInManager<IdentityUser> _signInManager;
 
-        public BookmarksController(ReadLaterDataContext context)
+        public BookmarksController(ReadLaterDataContext context, SignInManager<IdentityUser> signInManager)
         {
             _context = context;
+            _signInManager = signInManager;
         }
 
         // GET: Bookmarks
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int id)
         {
-            var readLaterDataContext = _context.Bookmark.Include(b => b.Category);
+            var readLaterDataContext = _context.Bookmark.Where(b => b.CategoryId == id).Include(b => b.Category);
+            ViewData["CategoryId"] = id;
             return View(await readLaterDataContext.ToListAsync());
         }
 
@@ -37,6 +41,9 @@ namespace ReadLater5.Controllers
             var bookmark = await _context.Bookmark
                 .Include(b => b.Category)
                 .FirstOrDefaultAsync(m => m.ID == id);
+
+            ViewData["CategoryId"] = bookmark.CategoryId;
+
             if (bookmark == null)
             {
                 return NotFound();
@@ -46,9 +53,11 @@ namespace ReadLater5.Controllers
         }
 
         // GET: Bookmarks/Create
-        public IActionResult Create()
+        public IActionResult Create(int id)
         {
-            ViewData["Category"] = new SelectList(_context.Categories, "ID", "Name");
+            string userId = _signInManager.UserManager.GetUserId(User);
+            ViewData["Category"] = new SelectList(_context.Categories.Where(c => c.UserId == userId), "ID", "Name", id);
+            ViewData["CategoryId"] = id;
             return View();
         }
 
@@ -65,7 +74,10 @@ namespace ReadLater5.Controllers
             {
                 return NotFound();
             }
-            ViewData["Category"] = new SelectList(_context.Categories, "ID", "Name", bookmark.CategoryId);
+
+            string userId = _signInManager.UserManager.GetUserId(User);
+            ViewData["Category"] = new SelectList(_context.Categories.Where(c => c.UserId == userId), "ID", "Name", bookmark.CategoryId);
+            ViewData["CategoryId"] = bookmark.CategoryId;
             return View(bookmark);
         }
 
