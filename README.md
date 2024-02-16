@@ -19,14 +19,20 @@ Thank you for the giving me this opportunity to take the test. It was very good 
 **3. API access**
 	Expose an API allowing external systems to manage bookmarks. You will need to consider authentication / access tokens.
 -	Implemented access token-based Api calls to update bookmarks only.
--	
+ 
 **Below are the steps to get an access token **
 -	Run the application locally.
 -	Using Postman or any other tool, make a POST request to /api/login/oauth 
 (eg: https://localhost:44326/api/login/oauth) add raw json data to the request with registered username and password.
 
-**Request** - {"username":"admin@admin.com", "password":"Admin@123"}
-**Response** {    
+**Request** - 
+{
+  "username":"admin@admin.com", 
+  "password":"Admin@123"
+}
+
+**Response** 
+{    
   "access_Token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjdmY2VlOWUyLWUxODYtNDljYi04ZGRkLTc4NGVkZGU5YWFkMiIsIm5iZiI6MTcwODA5MDg0NCwiZXhwIjoxNzA4MDkxNzQ0LCJpYXQiOjE3MDgwOTA4NDQsImlzcyI6InRlc3QtaXNzdWVyIiwiYXVkIjoidGVzdC1hdWRpZW5jZSJ9.Kjr_6nD96I7YAEBfgN-f9Yb58uoKZERJ_j9KZDhZ4iI",
     "expiresIn": 15,
     "type": "Bearer"
