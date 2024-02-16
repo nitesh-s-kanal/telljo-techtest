@@ -8,6 +8,10 @@ using Microsoft.EntityFrameworkCore;
 using Data;
 using Entity;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
+using Microsoft.Extensions.Options;
 
 namespace ReadLater5.Controllers
 {
@@ -16,16 +20,23 @@ namespace ReadLater5.Controllers
     public class BookmarksApiController : ControllerBase
     {
         private readonly ReadLaterDataContext _context;
+        private readonly TokenValidationParameters _tokenValidationParameters;
 
-        public BookmarksApiController(ReadLaterDataContext context)
+        public BookmarksApiController(ReadLaterDataContext context, IOptions<TokenValidationParameters> tokenValidationParameters)
         {
             _context = context;
+            _tokenValidationParameters = tokenValidationParameters.Value;
         }
 
         // GET: api/BookmarksApi
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Bookmark>>> GetBookmark()
         {
+            if (!IsTokenValid(HttpContext.Request.Headers["Authorization"]))
+            {
+                return Unauthorized("Invalid access token");
+            }
+
             return await _context.Bookmark.ToListAsync();
         }
 
@@ -33,6 +44,11 @@ namespace ReadLater5.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Bookmark>> GetBookmark(int id)
         {
+            if (!IsTokenValid(HttpContext.Request.Headers["Authorization"]))
+            {
+                return Unauthorized("Invalid access token");
+            }
+
             var bookmark = await _context.Bookmark.FindAsync(id);
 
             if (bookmark == null)
@@ -46,9 +62,13 @@ namespace ReadLater5.Controllers
         // PUT: api/BookmarksApi/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> PutBookmark(int id, Bookmark bookmark)
         {
+            if (!IsTokenValid(HttpContext.Request.Headers["Authorization"]))
+            {
+                return Unauthorized("Invalid access token");
+            }
+
             if (id != bookmark.ID)
             {
                 return BadRequest();
@@ -83,6 +103,11 @@ namespace ReadLater5.Controllers
         [HttpPost]
         public async Task<ActionResult<Bookmark>> PostBookmark(Bookmark bookmark)
         {
+            if (!IsTokenValid(HttpContext.Request.Headers["Authorization"]))
+            {
+                return Unauthorized("Invalid access token");
+            }
+
             bookmark.CreateDate = DateTime.UtcNow;
             _context.Bookmark.Add(bookmark);
             await _context.SaveChangesAsync();
@@ -92,9 +117,13 @@ namespace ReadLater5.Controllers
 
         // DELETE: api/BookmarksApi/5
         [HttpDelete("{id}")]
-        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteBookmark(int id)
         {
+            if (!IsTokenValid(HttpContext.Request.Headers["Authorization"]))
+            {
+                return Unauthorized("Invalid access token");
+            }
+
             var bookmark = await _context.Bookmark.FindAsync(id);
             if (bookmark == null)
             {
@@ -110,6 +139,35 @@ namespace ReadLater5.Controllers
         private bool BookmarkExists(int id)
         {
             return _context.Bookmark.Any(e => e.ID == id);
+        }
+
+        [NonAction]
+        private bool IsTokenValid(string accessToken)
+        {
+            if(!accessToken.StartsWith("Bearer "))
+            {
+                return false;
+            }
+
+            //removing the Bearer token value.
+            accessToken = accessToken.Replace("Bearer ","");
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            _tokenValidationParameters.IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("7fcee9e2-e186-49cb-8ddd-784edde9aad2"));
+            _tokenValidationParameters.ValidAudience = "test-audience";
+            _tokenValidationParameters.ValidIssuer = "test-issuer";
+
+            var token = tokenHandler.ValidateToken(accessToken, _tokenValidationParameters, out var securityToken);
+
+            var jwtToken = securityToken as JwtSecurityToken;
+
+            if(jwtToken != null && jwtToken.ValidTo > DateTime.UtcNow)
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }
