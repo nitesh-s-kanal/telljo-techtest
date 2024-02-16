@@ -44,8 +44,8 @@ Thank you for the giving me this opportunity to take the test. It was very good 
 }
  
 Updating bookmarks externally.
-1.	Add access token for Authorization
-2.	Add form data “clientid” : “registered email id”
+1.	Add access token for Authorization (Bearer Token)
+2.	Add form data “clientid” : “registered email id” 
 
 **GET (get all bookmarks)**
 
