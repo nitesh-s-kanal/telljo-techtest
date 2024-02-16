@@ -2,6 +2,11 @@
 
 Thank you for the giving me this opportunity to take the test. It was very good and interesting. (Sorry for the bad formatting below)
 
+**Pre-requesists:**
+1. Open solution in Visual Studio and Update the connection string in appsettings.json to point to a Sql Server / Sql Server Express instance (no need to create a database)
+3. In Package Manager Console, ensure the Data project is selected and run the command 'update-database'
+4. Your database will be created/updated
+
 **1. Bookmark management**
 	
  Implement full CRUD management for Bookmarks. Users should be able to create a new category whilst creating a bookmark without requiring any page refresh.
