@@ -43,15 +43,21 @@ Updating bookmarks externally.
 2.	Add form data “clientid” : “registered email id”
 
 **GET (get all bookmarks)**
+
 **URL**: api/bookmarks/getallbookmarks
+
 **Request**: {}
 
 **GET (Specific bookmark)**
+
 **URL**: api/bookmarks/getbookmark/{bookmark id}
+
 **Request**: {}
 
 **POST (Create bookmark)**
+
 **URL**:  api/bookmarks/createbookmark
+
 **Request**: 
 {
     "url": "Admin Cat 1331",
@@ -61,7 +67,9 @@ Updating bookmarks externally.
 
 
 **PUT (Edit bookmark)**
+
 **URL**: api/bookmarks/updatebookmark/{bookmark id}
+
 **Request**: 
 {
     "id": 20,
@@ -71,6 +79,8 @@ Updating bookmarks externally.
 }
 
 **DELETE (Delete bookmark)**
+
 **URL**: api/bookmarks/deletebookmark/{bookmark id}
+
 **Request**: {}
 
