@@ -14,6 +14,8 @@ using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
+using Services;
+using System.Data;
 
 namespace ReadLater5.Controllers
 {
@@ -21,29 +23,32 @@ namespace ReadLater5.Controllers
     [ApiController]
     public class BookmarksApiController : ControllerBase
     {
-        private readonly ReadLaterDataContext _context;
         private readonly TokenValidationParameters _tokenValidationParameters;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly IBookmarkService _bookmarkService;
 
-        public BookmarksApiController(ReadLaterDataContext context, SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager)
+        public BookmarksApiController(IBookmarkService bookmarkService, SignInManager<IdentityUser> signInManager, 
+            UserManager<IdentityUser> userManager)
         {
-            _context = context;
             _tokenValidationParameters = new();
             _signInManager = signInManager;
             _userManager = userManager;
+            _bookmarkService = bookmarkService;
         }
 
         // GET: api/bookmarks/getallbookmarks
         [HttpGet("getallbookmarks")]
-        public async Task<ActionResult<IEnumerable<Bookmark>>> GetBookmark()
+        public async Task<ActionResult<IEnumerable<Bookmark>>> GetAllBookmarksForUser()
         {
             if (!IsTokenValid() && !_signInManager.IsSignedIn(User))
             {
                 return Unauthorized("Invalid access token");
             }
 
-            return await _context.Bookmark.ToListAsync();
+            string userId = _signInManager.UserManager.GetUserId(User);
+
+            return await _bookmarkService.GetAllBookmarksForTheUser(userId);
         }
 
         // GET: api/bookmarks/getbookmark/5
@@ -55,7 +60,7 @@ namespace ReadLater5.Controllers
                 return Unauthorized("Invalid access token");
             }
 
-            var bookmark = await _context.Bookmark.FindAsync(id);
+            var bookmark = await _bookmarkService.GetBookmark(id);
 
             if (bookmark == null)
             {
@@ -80,25 +85,17 @@ namespace ReadLater5.Controllers
                 return BadRequest();
             }
 
-            //var existingBookmark = await _context.Bookmark.FindAsync(id);
-            _context.Entry(bookmark).State = EntityState.Modified;
-
             try
             {
-               // bookmark.CreateDate = existingBookmark.CreateDate;
+                //var existingBookmark = await _bookmarkService.GetBookmark(bookmark.ID);
+                //bookmark.CreateDate = existingBookmark.CreateDate;
                 bookmark.LastUpdatedDate = DateTime.UtcNow;
-                await _context.SaveChangesAsync();
+
+                await _bookmarkService.UpdateBookmark(bookmark);
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!BookmarkExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                throw new DBConcurrencyException("Concurrency issue");
             }
 
             return NoContent();
@@ -115,8 +112,9 @@ namespace ReadLater5.Controllers
             }
 
             bookmark.CreateDate = DateTime.UtcNow;
-            _context.Bookmark.Add(bookmark);
-            await _context.SaveChangesAsync();
+            bookmark.LastUpdatedDate = DateTime.UtcNow;
+
+            await _bookmarkService.CreateBookmark(bookmark);
 
             return CreatedAtAction("GetBookmark", new { id = bookmark.ID }, bookmark);
         }
@@ -130,32 +128,28 @@ namespace ReadLater5.Controllers
                 return Unauthorized("Invalid access token");
             }
 
-            var bookmark = await _context.Bookmark.FindAsync(id);
+            var bookmark = await _bookmarkService.GetBookmark(id);
             if (bookmark == null)
             {
                 return NotFound();
             }
 
-            _context.Bookmark.Remove(bookmark);
-            await _context.SaveChangesAsync();
+            await _bookmarkService.DeleteBookmark(bookmark);
 
             return NoContent();
-        }
-
-        private bool BookmarkExists(int id)
-        {
-            return _context.Bookmark.Any(e => e.ID == id);
         }
 
         [NonAction]
         private bool IsTokenValid()
         {
-            string accessToken = HttpContext.Request.Headers["Authorization"];
-            string userEmail = HttpContext.Request.Form["clientid"];
+            string accessToken = HttpContext.Request.Headers != null ? HttpContext.Request.Headers["Authorization"] : string.Empty;
+            if (string.IsNullOrWhiteSpace(accessToken) || !accessToken.StartsWith("Bearer "))
+            {
+                return false;
+            }
 
-            if (string.IsNullOrWhiteSpace(accessToken) || 
-                    !accessToken.StartsWith("Bearer ") ||
-                    string.IsNullOrWhiteSpace(userEmail))
+            string userEmail = HttpContext.Request.Headers != null ? HttpContext.Request.Headers["clientid"] : string.Empty;
+            if (string.IsNullOrWhiteSpace(userEmail))
             {
                 return false;
             }

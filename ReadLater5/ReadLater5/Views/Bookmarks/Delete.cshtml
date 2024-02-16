@@ -40,7 +40,7 @@
     <form id="delete-bookmark">
         <input id="hdn-delete" type="hidden" asp-for="ID" value="@Model.ID"/>
         <input id="btn-delete" type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index" asp-route-to="@ViewBag.CategoryId">Back to List</a>
+        <a asp-action="Index" asp-route-id="@ViewBag.CategoryId">Back to List</a>
          <span id="response"></span>
     </form>
 </div>

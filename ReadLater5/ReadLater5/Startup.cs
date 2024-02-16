@@ -56,6 +56,7 @@ namespace ReadLater5
             //    });
 
             services.AddScoped<ICategoryService, CategoryService>();
+            services.AddScoped<IBookmarkService, BookmarkService>();
 
             services.AddControllersWithViews();
         }

@@ -92,6 +92,7 @@ namespace ReadLater5.Controllers
         {
             if (ModelState.IsValid)
             {
+                category.UserId = _signInManager.UserManager.GetUserId(User) ?? string.Empty;
                 _categoryService.UpdateCategory(category);
                 return RedirectToAction("Index");
             }
