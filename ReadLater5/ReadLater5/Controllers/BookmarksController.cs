@@ -92,6 +92,9 @@ namespace ReadLater5.Controllers
             var bookmark = await _context.Bookmark
                 .Include(b => b.Category)
                 .FirstOrDefaultAsync(m => m.ID == id);
+
+            ViewData["CategoryId"] = bookmark.CategoryId;
+
             if (bookmark == null)
             {
                 return NotFound();

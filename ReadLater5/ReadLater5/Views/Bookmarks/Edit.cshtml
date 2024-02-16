@@ -55,7 +55,7 @@
             }
 
             $.ajax({
-                url: '/api/BookmarksApi/' + bookmarkId,
+                url: document.location.origin + '/api/bookmarks/updatebookmark/' + bookmarkId,
                 type: 'PUT',
                 contentType: 'application/json',
                 data: JSON.stringify(formData),

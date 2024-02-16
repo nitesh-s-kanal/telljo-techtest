@@ -51,7 +51,7 @@
             }
 
             $.ajax({
-                url: '/api/BookmarksApi',
+                url: document.location.origin + '/api/bookmarks/createbookmark',
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify(formData),

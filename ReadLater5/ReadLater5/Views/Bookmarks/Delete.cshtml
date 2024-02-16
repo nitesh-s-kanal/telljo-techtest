@@ -40,7 +40,7 @@
     <form id="delete-bookmark">
         <input id="hdn-delete" type="hidden" asp-for="ID" value="@Model.ID"/>
         <input id="btn-delete" type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
+        <a asp-action="Index" asp-route-to="@ViewBag.CategoryId">Back to List</a>
          <span id="response"></span>
     </form>
 </div>
@@ -53,7 +53,7 @@
             var bookmarkId = $('#hdn-delete').val();
 
             $.ajax({
-                url: '/api/BookmarksApi/' + bookmarkId,
+                url: document.location.origin + '/api/bookmarks/deletebookmark/' + bookmarkId,
                 type: 'DELETE',
                 success: function (response) {
                     console.log(response);
