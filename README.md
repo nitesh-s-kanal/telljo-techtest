@@ -1,15 +1,18 @@
 **TellJO - Tech Test**
+
 Thank you for the giving me this opportunity to take the test. It was very good and interesting. (Sorry for the bad formatting below)
 
 **1. Bookmark management**
-	Implement full CRUD management for Bookmarks. Users should be able to create a new category whilst creating a bookmark without requiring any page refresh.
+	
+ Implement full CRUD management for Bookmarks. Users should be able to create a new category whilst creating a bookmark without requiring any page refresh.
 -	Implemented bookmarks based on each category.
 -	Implemented CRUD operations without page refresh (jQuery AJAX)
 -	Categories are only visible when logged in.
 -	Added UserId mapping to category table
   
 **2. User accounts**
-	The package has the default AspNetCore Identity installed however not implemented fully. Complete this implementation and change the entities to work on a per user basis. For additional credit, implement multiple membership providers allowing users to log in with OpenID services.
+	
+ The package has the default AspNetCore Identity installed however not implemented fully. Complete this implementation and change the entities to work on a per user basis. For additional credit, implement multiple membership providers allowing users to log in with OpenID services.
 -	Implemented changes to work on per user basis for entities.
 -	Validated User logins for bookmarks
  
