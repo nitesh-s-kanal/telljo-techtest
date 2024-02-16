@@ -47,7 +47,7 @@ Updating bookmarks externally.
 1.	Add access token for Authorization (Bearer Token)
 2.	Add additional header data [“clientid” : “registered email id”]
 
-**GET (get all bookmarks)**
+**GET (get all bookmarks for the user)**
 
 **URL**: api/bookmarks/getallbookmarks
 
@@ -73,7 +73,7 @@ Updating bookmarks externally.
 
 **PUT (Edit bookmark)**
 
-**URL**: api/bookmarks/updatebookmark/{bookmark id}
+**URL**: api/bookmarks/updatebookmark/{category id}
 
 **Request**: 
 {
@@ -88,4 +88,6 @@ Updating bookmarks externally.
 **URL**: api/bookmarks/deletebookmark/{bookmark id}
 
 **Request**: {}
+
+**Note:** Since API and MVC is running in a single application, the api access might always pass once its logged in, so please test api before testing the application flow. I did try to fix all the issue but there might be few unknown ones.
 
